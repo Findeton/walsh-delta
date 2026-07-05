@@ -1,0 +1,65 @@
+Part A: inequality verification on in-regime laws
+[three-dip family] n=9  D=0.010830  N*D=5.5448  in-regime(D<=1/60)=True
+   Lemma 5.1     u_max <= sqrt(2D): True
+   Lemma 5.1     h_min >= 0.5*log(1/2D): True
+   Lemma 5.2(i)  k <= D*N/psi(1/2): True
+   Thm 6.1       deep count m >= 3: True
+   Prop 5.3(i)   |ghat + F/N| <= eps_G: True
+   Prop 5.3(ii)  min|F|/N >= h': True
+   Prop 5.3(iii) sign readout eps=-sgnF: True
+   Thm 6.1       N*D >= 2.878716: True
+[three-dip family] n=10  D=0.005415  N*D=5.5451  in-regime(D<=1/60)=True
+   Lemma 5.1     u_max <= sqrt(2D): True
+   Lemma 5.1     h_min >= 0.5*log(1/2D): True
+   Lemma 5.2(i)  k <= D*N/psi(1/2): True
+   Thm 6.1       deep count m >= 3: True
+   Prop 5.3(i)   |ghat + F/N| <= eps_G: True
+   Prop 5.3(ii)  min|F|/N >= h': True
+   Prop 5.3(iii) sign readout eps=-sgnF: True
+   Thm 6.1       N*D >= 2.878716: True
+[three-dip family] n=11  D=0.002708  N*D=5.5452  in-regime(D<=1/60)=True
+   Lemma 5.1     u_max <= sqrt(2D): True
+   Lemma 5.1     h_min >= 0.5*log(1/2D): True
+   Lemma 5.2(i)  k <= D*N/psi(1/2): True
+   Thm 6.1       deep count m >= 3: True
+   Prop 5.3(i)   |ghat + F/N| <= eps_G: True
+   Prop 5.3(ii)  min|F|/N >= h': True
+   Prop 5.3(iii) sign readout eps=-sgnF: True
+   Thm 6.1       N*D >= 2.878716: True
+[j=3 family] n=9  D=0.015325  N*D=7.8464  in-regime(D<=1/60)=True
+   Lemma 5.1     u_max <= sqrt(2D): True
+   Lemma 5.1     h_min >= 0.5*log(1/2D): True
+   Lemma 5.2(i)  k <= D*N/psi(1/2): True
+   Thm 6.1       deep count m >= 3: True
+   Prop 5.3(i)   |ghat + F/N| <= eps_G: True
+   Prop 5.3(ii)  min|F|/N >= h': True
+   Prop 5.3(iii) sign readout eps=-sgnF: True
+   Thm 6.1       N*D >= 2.878716: True
+[j=3 family] n=10  D=0.007663  N*D=7.8466  in-regime(D<=1/60)=True
+   Lemma 5.1     u_max <= sqrt(2D): True
+   Lemma 5.1     h_min >= 0.5*log(1/2D): True
+   Lemma 5.2(i)  k <= D*N/psi(1/2): True
+   Thm 6.1       deep count m >= 3: True
+   Prop 5.3(i)   |ghat + F/N| <= eps_G: True
+   Prop 5.3(ii)  min|F|/N >= h': True
+   Prop 5.3(iii) sign readout eps=-sgnF: True
+   Thm 6.1       N*D >= 2.878716: True
+[j=3 family] n=11  D=0.003831  N*D=7.8466  in-regime(D<=1/60)=True
+   Lemma 5.1     u_max <= sqrt(2D): True
+   Lemma 5.1     h_min >= 0.5*log(1/2D): True
+   Lemma 5.2(i)  k <= D*N/psi(1/2): True
+   Thm 6.1       deep count m >= 3: True
+   Prop 5.3(i)   |ghat + F/N| <= eps_G: True
+   Prop 5.3(ii)  min|F|/N >= h': True
+   Prop 5.3(iii) sign readout eps=-sgnF: True
+   Thm 6.1       N*D >= 2.878716: True
+
+Part B: Section 9 table -- three-dip family, N*D vs 4log4 = 5.545177
+   n=3  N*D = 4.7662
+   n=4  N*D = 5.2488
+   n=5  N*D = 5.4599
+   n=6  N*D = 5.5233
+   n=7  N*D = 5.5397
+   n=8  N*D = 5.5438
+
+ALL CHECKS PASS

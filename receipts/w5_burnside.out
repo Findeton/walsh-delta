@@ -1,0 +1,4 @@
+n=2: |GL(n,2)|=6, orbits=2, remainder=0 OK
+n=3: |GL(n,2)|=168, orbits=4, remainder=0 OK
+n=4: |GL(n,2)|=20160, orbits=14, remainder=0 OK
+n=5: |GL(n,2)|=9999360, orbits=176, remainder=0 OK

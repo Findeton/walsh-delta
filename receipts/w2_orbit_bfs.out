@@ -1,0 +1,4 @@
+n=2: orbits=2, checksum=8 (expected 8) OK
+n=3: orbits=4, checksum=128 (expected 128) OK
+n=4: orbits=14, checksum=32768 (expected 32768) OK
+n=5: orbits=176, checksum=2147483648 (expected 2147483648) OK

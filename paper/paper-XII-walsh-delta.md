@@ -1,0 +1,1056 @@
+# The delta orientation is the unique entropy minimizer for self-calibrated ±1 Walsh tilts on the Boolean cube
+
+**Author:** Felix Robles Elvira (ORCID: 0009-0009-2017-4394; independent researcher)
+
+**Status:** preprint, not peer reviewed, version 2026-07-02.  This paper
+is mathematically self-contained: no result below depends on any other
+paper in this repository or elsewhere.  The range $n \le 5$ of the main
+theorem is computer-assisted; Section 8 states the exact computational
+claims, their certificates, and their trust base, and the repository
+ships the complete certification code and canonical outputs (receipts
+`w1`–`w5`).
+
+## Abstract
+
+For each choice of signs $\epsilon_a \in \{\pm 1\}$, one per nonzero
+Walsh character $\chi_a$ on the Boolean cube $G = \{\pm1\}^n$
+($N = 2^n$ points), consider the exponential-family law
+$P_\epsilon(s) \propto \exp\big(\sum_{a \ne 0} h_a \epsilon_a
+\chi_a(s)\big)$ whose parameters are *self-calibrated* by the fixed-point
+conditions $\mathbb{E}_{P_\epsilon}[\epsilon_a \chi_a] = e^{-h_a}$ for
+every $a \ne 0$: each tilted correlation must equal the exponential of
+minus its own tilt parameter.  We prove that this system has exactly one
+solution for every sign choice, and that the relative entropy
+$D(P_\epsilon \Vert U)$ from the uniform law is minimized, strictly and
+uniquely up to the natural $N$-element symmetry orbit, by the **delta
+orientations** $\epsilon_a = -\chi_a(s_\star)$ — the sign patterns whose
+calibrated law is uniform on $N-1$ points and nearly extinguishes the
+single point $s_\star$.  The proof is elementary and quantitative.  Its
+core is a *deep-dip trichotomy*: any non-delta calibrated law with
+$D \le 1/60$ must extinguish at least three points of the cube to depth
+$e^{-5}$, forcing $N \cdot D \ge 3\,\psi(e^{-5}) > 2.878716$ where
+$\psi(x) = x\log x - x + 1$, while the delta value satisfies
+$N \cdot D_\delta < N/(N-1)$.  For $n \ge 6$ this closes the theorem
+analytically; for $n \le 5$ we verify it by certified computation
+(exhaustive over all $2^{N-1}$ orientations for $n \le 4$; via a
+provably complete $176$-orbit symmetry transversal of the $2^{31}$
+orientations at $n = 5$), with a posteriori Newton–Kantorovich error
+certificates throughout.  The minimizing value is not a photo-finish:
+the best non-delta family we exhibit satisfies
+$N \cdot D \to 4\log 4 = 5.545\ldots$, and we conjecture this is the
+sharp asymptotic runner-up constant.  The self-calibration fixed point
+appears to be new; its nearest relatives are the extremal theory of
+Littlewood ($\pm1$-coefficient) polynomials and the self-consistent
+field equations of statistical mechanics, and we state our literature
+position explicitly in Section 1.4.
+
+**MSC 2020:** 94A17 (primary); 60E15, 42C10, 05D40, 65G20 (secondary).
+
+**Keywords:** Boolean cube; Walsh--Fourier analysis; relative entropy;
+exponential family; self-calibration; computer-assisted proof;
+Newton--Kantorovich certificate.
+
+## 1. Introduction
+
+### 1.1 The objects
+
+Let $n \ge 2$, let $G = \{-1,+1\}^n$ be the Boolean cube with
+$N = 2^n$ points, and let $U$ denote the uniform probability law on
+$G$.  We identify $G$ with $\mathbb{F}_2^n$ (coordinatewise, $+1
+\leftrightarrow 0$ and $-1 \leftrightarrow 1$), write $s + t$ for the
+group operation (coordinatewise multiplication in the $\pm1$ picture),
+and index the Walsh characters by masks $a \in \mathbb{F}_2^n$:
+
+$$
+\chi_a(s) = \prod_{i \,:\, a_i = 1} s_i, \qquad
+\chi_0 \equiv 1, \qquad
+\chi_a \chi_b = \chi_{a+b}.
+$$
+
+The $N$ characters form an orthonormal basis of $L^2(G, U)$; for
+$f : G \to \mathbb{R}$ we write $\widehat f(a) = \mathbb{E}_U[f
+\chi_a]$, so that $f = \sum_a \widehat f(a) \chi_a$ and Parseval's
+identity $\mathbb{E}_U[f g] = \sum_a \widehat f(a) \widehat g(a)$
+holds.
+
+An **orientation** is a sign vector
+$\epsilon = (\epsilon_a)_{a \ne 0} \in \{\pm1\}^{N-1}$, one sign per
+nonzero mask.  There are $2^{N-1}$ orientations.
+
+> **Definition 1.1 (calibrated law).**  A probability law $P$ on $G$
+> with full support is *calibrated for the orientation $\epsilon$* if
+> there exist reals $(h_a)_{a \ne 0}$ such that
+> $$
+> P(s) = \frac{\exp\big(\sum_{a\ne0} h_a \epsilon_a \chi_a(s)\big)}
+> {\sum_{r \in G} \exp\big(\sum_{a\ne0} h_a \epsilon_a \chi_a(r)\big)}
+> \qquad \text{and} \qquad
+> \mathbb{E}_P[\epsilon_a \chi_a] = e^{-h_a} \quad (a \ne 0).
+> $$
+
+The defining conditions are a fixed point: the parameter $h_a$ shapes
+$P$, and the correlation that $P$ produces on the signed character
+$\epsilon_a\chi_a$ is required to equal $e^{-h_a}$, a strictly
+decreasing function of that same parameter.  Two structural
+consequences are immediate and are used throughout.  First, since
+$e^{-h_a} > 0$, a calibrated law has **nonzero correlation of
+prescribed sign with every one of the $N-1$ characters**; in
+particular it is never uniform.  Second, writing $X = N P$ for the
+density of $P$ with respect to $U$ and $x_a = \widehat X(a) =
+\mathbb{E}_P[\chi_a]$, the conditions say exactly
+$$
+x_a = \epsilon_a e^{-h_a}, \qquad
+\widehat{\log X}(a) = \epsilon_a h_a \qquad (a \ne 0),
+$$
+because $\log X = \sum_{a \ne 0} h_a\epsilon_a\chi_a + \text{const}$.
+Note that $h_a > 0$ automatically: $e^{-h_a} = |x_a| =
+|\mathbb{E}_P[\chi_a]| < 1$ for any full-support law, since $\chi_a$
+is a nonconstant $\pm1$-valued function.
+Thus the Walsh coefficients of $X$ and of $\log X$ carry the same
+signs, with magnitudes linked by $|x_a| = e^{-|\widehat{\log X}(a)|}$.
+The orientation is recoverable from the law:
+$\epsilon_a = \operatorname{sgn}(x_a)$.
+
+Theorem 3.1 below proves that **every orientation has exactly one
+calibrated law**, denoted $P_\epsilon$, as the unique minimizer of an
+explicit smooth, strictly convex, coercive function on
+$\mathbb{R}^{N-1}$.  The quantity of interest is the relative entropy
+(Kullback–Leibler divergence) from uniform,
+
+$$
+\widehat m(\epsilon) \;=\; D(P_\epsilon \Vert U)
+\;=\; \mathbb{E}_U[X \log X] \;\ge\; 0 ,
+$$
+
+which is strictly positive for every orientation (a calibrated law is
+never uniform).  Which orientation makes it smallest?
+
+### 1.2 The delta orientations and the main theorem
+
+Fix $s_\star \in G$ and take $\epsilon_a^\star = -\chi_a(s_\star)$ for
+every $a \ne 0$: every sign is chosen to *disagree* with the point
+$s_\star$.  We call this the **delta orientation at $s_\star$**; there
+are exactly $N$ of them, one per point, and they form a single orbit
+under the translation symmetry of the problem (Lemma 3.2).  The name
+comes from the raw sign field itself: $\sum_{a\ne0}
+\epsilon^\star_a\chi_a(s) = 1 - N\mathbf{1}_{s = s_\star}$, a negative
+delta spike.  Proposition 4.1 computes the calibrated law of a delta
+orientation in closed form: it is the two-level law
+
+$$
+X_\delta(s_\star) = 1 - (N-1)u_\star, \qquad
+X_\delta(s) = 1 + u_\star \quad (s \ne s_\star),
+$$
+
+where $u_\star \in (0, \tfrac1{N-1})$ is the unique positive root of
+$u^{N+1} + u^N + (N-1)u - 1 = 0$ — an almost-uniform law with one
+almost-extinguished point, whose gap $D_\delta := \widehat
+m(\epsilon^\star)$ satisfies $D_\delta < \frac{1}{N-1}$ (Lemma 4.2)
+and in fact $N D_\delta \to 1$.
+
+> **Theorem 1.2 (main theorem).**  For every $n \ge 2$ and every
+> orientation $\epsilon$,
+> $$
+> \widehat m(\epsilon) \;\ge\; \widehat m(\epsilon^\star),
+> $$
+> with equality if and only if $\epsilon$ is one of the $N$ delta
+> orientations.
+
+The theorem is proved analytically for all $n \ge 6$ (Sections 5–7)
+and by certified computation for $2 \le n \le 5$ (Section 8).  The
+analytic part yields the quantitative floor
+
+> **Corollary 1.3.**  For $n \ge 6$ and every non-delta orientation
+> $\epsilon$:
+> $\; N \cdot \widehat m(\epsilon) \ge \min\!\big(N/60,\; 2.878716\big)$,
+> while $N \cdot \widehat m(\epsilon^\star) < N/(N-1) \le 64/63$.
+
+### 1.3 The proof in one paragraph
+
+Suppose $\epsilon$ is not a delta orientation and $D = \widehat
+m(\epsilon) \le 1/60$; we must show this is very expensive anyway.
+Pinsker's inequality forces every correlation $|x_a| \le \sqrt{2D}$,
+hence every parameter $h_a \ge \frac12\log\frac{1}{2D} \ge
+\frac12\log 30$: *small entropy gap forces uniformly large
+parameters.*  Since $\widehat{\log X}(a) = \epsilon_a h_a$, the
+function $\log X$ has huge Fourier coefficients in every direction,
+and an $\ell^1$ bookkeeping of $\log X$ over the cube (Section 5)
+shows these coefficients are reproduced, up to a per-mask error
+$\varepsilon_G \le 2.5\sqrt{2D}$, by the *dip transform* $\Phi(a) =
+\sum_s \beta_s \chi_a(s)$ of the deeply suppressed points ($X(s) \le
+\frac12$, depth $\beta_s = -\log X(s)$).  Consequently $|\Phi(a)| \ge
+N(h_{\min} - \varepsilon_G) > 1.24416\,N$ at every mask, and the signs
+of $\Phi$ determine the orientation: $\epsilon_a = -\operatorname{sgn}
+\Phi(a)$.  Now split the dips at depth $5$.  The total depth of shallow
+dips is less than $0.543149\,N$ (their number is controlled by the
+entropy budget), so: with *zero* deep dips, $\Phi$ cannot clear its
+floor; with *one*, that dip dominates the configuration and the sign
+readout says $\epsilon$ is a delta orientation; with *two*, the floor
+on the anti-symmetric mask class forces a depth separation
+$>0.701014\,N$, which again makes the deeper dip dominant — a
+contradiction in all three cases.  Hence at least **three** points are
+suppressed below $e^{-5}$, and since $D = \mathbb{E}_U[\psi(X)]$ with
+$\psi \ge 0$, these alone cost $N D \ge 3\psi(e^{-5}) > 2.878716$.
+The delta costs less than $N/(N-1) \le 64/63$; and if instead
+$D > 1/60$ then $D > 1/60 > 1/63 \ge 1/(N-1) > D_\delta$ directly.
+Either way the delta wins strictly, for every $n \ge 6$.
+
+We emphasize the shape of the argument: the theorem is *not* won by
+locating the best non-delta competitor.  The cheapest non-delta family
+we know (Section 9) costs $N D \to 4\log4 = 5.545\ldots$, and proving
+that sharp constant remains open; but the theorem only requires
+beating $N D_\delta < 64/63$, and "three extinguished points versus
+one" clears that bar with margin $2.8\times$.
+
+### 1.4 Relation to the literature
+
+We have not found the self-calibration fixed point of Definition 1.1
+in the literature, and we state this as a position, not a claim of
+certainty.  Its ingredients are all classical.  (i) The sign
+fields $T_\epsilon = \sum_{a\ne0}\epsilon_a\chi_a$ are the Boolean-cube
+analogue of Littlewood polynomials (all coefficients $\pm1$), whose
+extremal theory — flatness, merit factors — is a long-standing subject
+[3]; our problem differs in that the field is passed through a
+nonlinear, self-referential Gibbs calibration before being measured.
+(ii) Exponential families on the cube with Walsh sufficient statistics
+are the standard log-linear/graphical models [4]; there the parameters
+are free or fit to external data, whereas here they are tied to the
+model's own correlations.  (iii) Self-consistent equations linking a
+field to its own expectation are the daily bread of mean-field
+statistical mechanics [6], but the standard link is $m = \tanh(h)$;
+the link $m = e^{-h}$, imposed *coefficientwise across an entire
+Walsh spectrum*, changes the character of the problem entirely (for
+instance, it forbids any vanishing correlation).  (iv) The analysis
+lives in the standard framework of Boolean Fourier analysis [2] and
+uses only Pinsker's inequality [1] and elementary convexity.
+
+### 1.5 Organization
+
+Section 2 fixes notation and records the two standard inequalities we
+use.  Section 3 proves existence, uniqueness, and the symmetry
+covariances of calibrated laws.  Section 4 computes the delta laws in
+closed form and proves $D_\delta < 1/(N-1)$.  Section 5 establishes
+the structure theory of low-entropy calibrated laws: the parameter
+floor, the dip/spike/bulk decomposition with its bookkeeping, the
+spectral floor and sign readout, and the dominance criterion.  Section
+6 proves the deep-dip trichotomy.  Section 7 assembles the main
+theorem for $n \ge 6$.  Section 8 specifies and certifies the
+computation for $n \le 5$.  Section 9 presents the extremal family and
+the sharp-constant conjecture.  Section 10 documents the code.  All
+decimal constants in Sections 5–7 are rounded in the *safe* direction
+(lower bounds down, upper bounds up).
+
+## 2. Preliminaries
+
+Throughout, $\log$ is the natural logarithm, $n \ge 2$, $N = 2^n$,
+and $X = NP$ denotes the density of a probability law $P$ with respect
+to $U$, so $\mathbb{E}_U[X] = 1$.  The relative entropy is
+$D(P \Vert U) = \mathbb{E}_U[X\log X]$.  We use two standard facts.
+
+> **Lemma 2.1 (Pinsker; see [1], Lemma 11.6.1).**  For any probability
+> law $P$ on $G$,
+> $$
+> \mathbb{E}_U\,|X - 1| \;=\; \sum_{s}\,\big|P(s) - \tfrac1N\big|
+> \;\le\; \sqrt{2\,D(P\Vert U)} .
+> $$
+
+(The middle quantity is twice the total variation distance; Pinsker's
+inequality in the form $\mathrm{TV} \le \sqrt{D/2}$ gives the stated
+bound.)  Two consequences used constantly: every Walsh coefficient
+obeys $|x_a| = |\mathbb{E}_U[(X-1)\chi_a]| \le \mathbb{E}_U|X-1| \le
+\sqrt{2D}$; and, since $\mathbb{E}_U[X-1] = 0$, the positive and
+negative parts match, $\mathbb{E}_U(X-1)_+ = \mathbb{E}_U(1-X)_+ =
+\tfrac12\mathbb{E}_U|X-1| \le \tfrac12\sqrt{2D}$.
+
+> **Lemma 2.2 (entropy integrand).**  Let $\psi(x) = x\log x - x + 1$
+> for $x > 0$, $\psi(0) = 1$.  Then $\psi \ge 0$, $\psi$ is strictly
+> decreasing on $[0,1]$ and strictly increasing on $[1,\infty)$, and
+> for any law $P$,
+> $$
+> D(P \Vert U) \;=\; \mathbb{E}_U[\psi(X)]
+> \;=\; \frac1N \sum_{s} \psi(X(s)).
+> $$
+
+*Proof.*  $\psi'(x) = \log x$, which is negative on $(0,1)$ and
+positive on $(1,\infty)$; $\psi(1) = 0$, so $\psi \ge 0$ and the
+monotonicity is as stated; $\psi(x) \to 1$ as $x \downarrow 0$.  The
+identity follows from $\mathbb{E}_U[X] = 1$:
+$\mathbb{E}_U[\psi(X)] = \mathbb{E}_U[X\log X] - 1 + 1 = D$.  $\square$
+
+We will also need two elementary calculus bounds, proved where used
+(Lemma 5.2): $|\log x| \le 2|x-1|$ on $[\tfrac12, 2]$, and specific
+values of $\psi$.
+
+## 3. Existence, uniqueness, and symmetry of calibrated laws
+
+For $\ell \in \mathbb{R}^{N-1}$ (indexed by nonzero masks) let
+
+$$
+F(\ell) \;=\; \log \mathbb{E}_U \exp\Big(\sum_{a\ne0} \ell_a
+\chi_a\Big)
+$$
+
+be the log-partition function and $P_\ell \propto
+\exp(\sum_a \ell_a\chi_a)$ the associated Gibbs law, so that
+$\partial F/\partial \ell_a = \mathbb{E}_{P_\ell}[\chi_a] =: x_a(\ell)$
+and $\nabla^2 F(\ell) = \operatorname{Cov}_{P_\ell}(\chi)$, the
+covariance matrix of the character vector.
+
+> **Theorem 3.1 (existence and uniqueness).**  For every orientation
+> $\epsilon$ the function
+> $$
+> G_\epsilon(\ell) \;=\; F(\ell) \;+\; \sum_{a \ne 0}
+> e^{-\epsilon_a \ell_a}
+> $$
+> is smooth, strictly convex, and coercive on $\mathbb{R}^{N-1}$; its
+> unique global minimizer $\ell^\ast$ satisfies the calibration
+> conditions of Definition 1.1 with $h_a = \epsilon_a\ell^\ast_a > 0$,
+> and conversely every calibrated law for $\epsilon$ arises this way.
+> In particular each orientation has exactly one calibrated law
+> $P_\epsilon$.
+
+*Proof.*  *Smoothness and strict convexity.*  $F$ is smooth with
+$\nabla^2 F = \operatorname{Cov}_{P_\ell}(\chi) \succeq 0$; each
+barrier term $e^{-\epsilon_a\ell_a}$ is smooth and convex with second
+derivative $e^{-\epsilon_a\ell_a} > 0$ in the coordinate $\ell_a$, so
+$\nabla^2 G_\epsilon \succeq \operatorname{diag}(e^{-\epsilon_a
+\ell_a}) \succ 0$: $G_\epsilon$ is strictly convex.
+
+*Coercivity.*  We first show $G_\epsilon(t v) \to \infty$ as
+$t \to \infty$ for every unit vector $v \ne 0$.  The function
+$s \mapsto \langle v, \chi(s)\rangle = \sum_a v_a\chi_a(s)$ has zero
+mean over $G$ and is not identically zero (the characters are linearly
+independent), so $\mu(v) := \max_s \langle v, \chi(s)\rangle > 0$.
+Bounding the expectation defining $F$ from below by the single term at
+an attaining $s$,
+$$
+F(tv) \;\ge\; t\,\mu(v) - \log N \;\longrightarrow\; \infty ,
+$$
+and the barrier terms are nonnegative, so $G_\epsilon(tv) \to
+\infty$.  Now let $\ell_k$ be any sequence with $\Vert\ell_k\Vert \to
+\infty$ and suppose $G_\epsilon(\ell_k) \le C$.  Passing to a
+subsequence, $v_k := \ell_k/\Vert\ell_k\Vert \to v$, a unit vector.
+Fix $t > 0$.  For all large $k$, $t \le \Vert\ell_k\Vert$, so
+convexity along the segment from $0$ to $\ell_k$ gives
+$G_\epsilon(t v_k) \le \max\{G_\epsilon(0), G_\epsilon(\ell_k)\}
+\le \max\{G_\epsilon(0), C\}$.  A finite convex function on
+$\mathbb{R}^{N-1}$ is continuous, so letting $k \to \infty$:
+$G_\epsilon(tv) \le \max\{G_\epsilon(0), C\}$ for every $t$ —
+contradicting $G_\epsilon(tv) \to \infty$.  Hence $G_\epsilon$ is
+coercive and attains a unique global minimum $\ell^\ast$.
+
+*The critical equations are the calibration.*  At any critical point,
+$$
+0 = \frac{\partial G_\epsilon}{\partial \ell_a}
+= x_a(\ell) - \epsilon_a e^{-\epsilon_a\ell_a}
+\quad\Longleftrightarrow\quad
+\mathbb{E}_{P_\ell}[\epsilon_a\chi_a] = e^{-\epsilon_a \ell_a} ,
+$$
+which is Definition 1.1 with $h_a = \epsilon_a\ell_a$; and $h_a > 0$
+follows because $e^{-h_a} = |\mathbb{E}_{P}[\chi_a]| < 1$ for any law
+with full support (the Gibbs law has full support, and $|\chi_a| = 1$
+with $\chi_a$ nonconstant).  Conversely a calibrated law is a Gibbs
+law $P_\ell$ with $\ell_a = h_a\epsilon_a$ satisfying the same
+first-order equations, i.e. a critical point of the strictly convex
+$G_\epsilon$, hence *the* minimizer.  $\square$
+
+The problem has an exact symmetry group, which we record next; it is
+used for the delta computation (Section 4) and for the $n = 5$ orbit
+reduction (Section 8).
+
+> **Lemma 3.2 (translation covariance).**  For $t \in G$ define
+> $(\tau_t\epsilon)_a = \epsilon_a\chi_a(t)$.  Then
+> $P_{\tau_t\epsilon}(s) = P_\epsilon(s + t)$ and $\widehat
+> m(\tau_t\epsilon) = \widehat m(\epsilon)$.  The $N$ delta
+> orientations form a single translation orbit:
+> $\tau_t(\epsilon^\star\text{ at }s_\star) = \epsilon^\star\text{ at }
+> s_\star + t$.
+
+*Proof.*  Given $\ell$, set $\ell'_a = \ell_a \chi_a(t)$.  Then
+$\sum_a \ell'_a \chi_a(s) = \sum_a \ell_a \chi_a(s+t)$, so
+$F(\ell') = F(\ell)$ (substituting $s \mapsto s + t$ in the defining
+expectation, a bijection preserving $U$) and $P_{\ell'}(s) =
+P_\ell(s+t)$.  Also $(\tau_t\epsilon)_a \ell'_a = \epsilon_a\ell_a$,
+so the barrier sums agree and
+$G_{\tau_t\epsilon}(\ell') = G_\epsilon(\ell)$.  The map $\ell \mapsto
+\ell'$ is a linear bijection, so it carries the unique minimizer to
+the unique minimizer; the laws are translates of one another, and
+relative entropy to the (translation-invariant) uniform law is
+unchanged.  For the delta orbit: $(\tau_t \epsilon^\star)_a =
+-\chi_a(s_\star)\chi_a(t) = -\chi_a(s_\star + t)$.  Since the map
+$s_\star \mapsto (-\chi_a(s_\star))_{a\ne0}$ is injective (characters
+separate points), the $N$ delta orientations are distinct and form one
+orbit.  $\square$
+
+> **Lemma 3.3 ($GL(n,2)$ covariance).**  For $M \in GL(n,2)$ define
+> the relabeled orientation $M\cdot\epsilon$ by
+> $(M\cdot\epsilon)_b = \epsilon_{M^{-\mathsf T} b}$, equivalently
+> $(M\cdot\epsilon)_{M^{\mathsf T} a} = \epsilon_a$.  Then
+> $P_{M\cdot\epsilon}$ is the image of $P_\epsilon$ under the
+> $U$-preserving bijection $s \mapsto M^{-1}s$, and
+> $\widehat m(M\cdot\epsilon) = \widehat m(\epsilon)$.  Moreover
+> $M\cdot(\text{delta at } s_\star) = \text{delta at }
+> M^{-1}s_\star$: the family of delta orientations is permuted among
+> itself.
+
+*Proof.*  The map $s \mapsto Ms$ (matrix action on
+$\mathbb{F}_2^n$-coordinates) is a bijection of $G$ preserving $U$,
+and $\chi_a(Ms) = (-1)^{\langle a, Ms\rangle} =
+(-1)^{\langle M^{\mathsf T} a, s\rangle} = \chi_{M^{\mathsf T}a}(s)$.
+Given $\ell$, define $\ell'$ by $\ell'_{M^{\mathsf T}a} = \ell_a$.
+Then $\sum_a \ell_a \chi_a(Ms) = \sum_b \ell'_b \chi_b(s)$, so
+$F(\ell') = F(\ell)$ (substitute $s \mapsto Ms$ inside the defining
+expectation) and $P_{\ell'}$ is the image of $P_\ell$ under
+$s \mapsto M^{-1}s$; the barrier sums agree under the reindexing,
+since $(M\cdot\epsilon)_{M^{\mathsf T}a}\,\ell'_{M^{\mathsf T}a} =
+\epsilon_a \ell_a$, so $G_{M\cdot\epsilon}(\ell') =
+G_\epsilon(\ell)$, and the linear bijection $\ell \mapsto \ell'$
+carries the unique minimizer to the unique minimizer.  Relative
+entropy to $U$ is invariant under a $U$-preserving bijection.  For
+the delta family, using $\langle M^{-\mathsf T}b, s_\star\rangle =
+\langle b, M^{-1}s_\star\rangle$:
+$$
+(M\cdot\epsilon^\star)_b \;=\; \epsilon^\star_{M^{-\mathsf T}b}
+\;=\; -\chi_{M^{-\mathsf T}b}(s_\star)
+\;=\; -\chi_b(M^{-1}s_\star),
+$$
+the delta orientation at $M^{-1}s_\star$.  $\square$
+
+Together, Lemmas 3.2 and 3.3 say that $\widehat m$ is constant on the
+orbits of the group $\Gamma_n = \langle \text{translations},
+GL(n,2)\rangle$ acting on orientations, and that the $N$ delta
+orientations form exactly one $\Gamma_n$-orbit (translations already
+act transitively on them, and $GL(n,2)$ maps the family to itself).
+
+## 4. The delta laws in closed form
+
+> **Proposition 4.1 (delta law).**  Let $\epsilon^\star$ be the delta
+> orientation at $s_\star$.  Its calibrated law is the two-level law
+> $$
+> X_\delta(s_\star) = 1 - (N-1)u_\star, \qquad
+> X_\delta(s) = 1 + u_\star \quad (s \ne s_\star),
+> $$
+> where $u_\star$ is the unique positive root of
+> $$
+> p(u) \;=\; u^{N+1} + u^N + (N-1)u - 1 \;=\; 0,
+> $$
+> and $u_\star \in (0, \tfrac1{N-1})$.  Consequently
+> $$
+> D_\delta \;=\; \frac1N\Big[A\log A + (N-1)B\log B\Big],
+> \qquad A = 1-(N-1)u_\star,\; B = 1+u_\star .
+> $$
+
+*Proof.*  By Lemma 3.2 it suffices to treat $s_\star = 0$ (the
+identity of $G$), where $\chi_a(s_\star) = 1$ and $\epsilon^\star
+\equiv -1$.  For any $M \in GL(n,2)$, the reindexing of Lemma 3.3
+fixes the constant orientation $\epsilon \equiv -1$; hence, by
+uniqueness of the minimizer, $\ell^\ast_{M^{\mathsf T}a} =
+\ell^\ast_a$ for all $a \ne 0$ and all $M$.  Since $GL(n,2)$ acts
+transitively on nonzero masks, all coordinates of $\ell^\ast$ are
+equal: $\ell^\ast_a = -h$ for some $h > 0$ (Theorem 3.1 gives
+$h_a = \epsilon_a\ell_a = h > 0$), and $u := e^{-h} \in (0,1)$.
+
+The density is then explicit.  With $x_a = \epsilon_a u = -u$ for all
+$a \ne 0$ and the Walsh inversion $\sum_{a \ne 0}\chi_a(s) =
+N\mathbf{1}_{s=0} - 1$:
+$$
+X(s) = 1 + \sum_{a\ne0} x_a \chi_a(s)
+= 1 - u\big(N\mathbf{1}_{s=0} - 1\big)
+= \begin{cases}
+1 - (N-1)u, & s = 0,\\
+1 + u, & s \ne 0 .
+\end{cases}
+$$
+Positivity of the Gibbs law forces $1 - (N-1)u > 0$, i.e. $u <
+\frac1{N-1}$.  It remains to impose the calibration on the
+$\log$-side.  With $A = 1-(N-1)u$, $B = 1+u$,
+$$
+\widehat{\log X}(a)
+= \frac1N\Big[\log A \cdot \chi_a(0) + \log B \sum_{s \ne 0}
+\chi_a(s)\Big]
+= \frac1N\big(\log A - \log B\big)
+\qquad (a \ne 0),
+$$
+using $\sum_{s\ne0}\chi_a(s) = -1$.  The calibration requires
+$\widehat{\log X}(a) = \epsilon_a h_a = -h = \log u$, i.e.
+$$
+\frac{1 - (N-1)u}{1+u} \;=\; u^N ,
+$$
+which after clearing denominators is exactly $p(u) = 0$.  Finally
+$p$ is strictly increasing on $[0,\infty)$ (its derivative is
+positive), $p(0) = -1 < 0$, and $p(\tfrac1{N-1}) =
+(\tfrac1{N-1})^{N}(1 + \tfrac1{N-1}) > 0$, so $p$ has a unique
+positive root and it lies in $(0, \tfrac1{N-1})$.  Conversely the
+two-level law with $u = u_\star$ *is* calibrated (all the above read
+backwards), so by uniqueness (Theorem 3.1) it is the calibrated law of
+$\epsilon^\star$.  The formula for $D_\delta$ is the definition of
+$D(P\Vert U)$ evaluated on the two levels.  $\square$
+
+> **Lemma 4.2 (elementary delta bound).**  For every $n \ge 2$,
+> $$
+> 0 \;<\; D_\delta \;<\; \frac{1}{N-1} .
+> $$
+
+*Proof.*  Positivity holds because the calibrated law is not uniform
+(Section 1.1).  For the upper bound: $A \in (0,1)$, so $A\log A \le
+0$, and hence
+$$
+D_\delta \le \frac{N-1}{N}\,(1+u_\star)\log(1+u_\star)
+\le \frac{N-1}{N}\,u_\star(1+u_\star),
+$$
+using $\log(1+x) \le x$.  Now $u_\star < \frac1{N-1}$ gives
+$1 + u_\star < \frac{N}{N-1}$ and therefore
+$$
+D_\delta \;<\; \frac{N-1}{N}\cdot\frac{1}{N-1}\cdot\frac{N}{N-1}
+\;=\; \frac{1}{N-1}. \qquad \square
+$$
+
+Two remarks.  First, the bound is asymptotically tight: from
+$p(u_\star) = 0$ one gets $u_\star = \frac1{N-1}(1 - O(N^{-N}))$ and
+$N D_\delta \to 1$; we never need this.  Second, by Lemma 3.2 all $N$
+delta orientations share the single value $D_\delta$.
+
+## 5. Structure of low-entropy calibrated laws
+
+Throughout this section and the next, $P$ is the calibrated law of an
+orientation $\epsilon$, $X = NP$, $D = D(P\Vert U) \le \frac{1}{60}$,
+and all decimal constants are safe-rounded.  Write $h_{\min} =
+\min_{a\ne0} h_a$.
+
+> **Lemma 5.1 (parameter floor).**  Every $a \ne 0$ satisfies
+> $$
+> |x_a| \le \sqrt{2D}
+> \qquad\text{and}\qquad
+> h_a \;\ge\; \tfrac12 \log\tfrac{1}{2D}
+> \;\ge\; \tfrac12\log 30 \;>\; 1.70059 .
+> $$
+
+*Proof.*  $|x_a| = |\mathbb{E}_U[(X-1)\chi_a]| \le \mathbb{E}_U|X-1|
+\le \sqrt{2D}$ by Lemma 2.1.  The calibration gives $|x_a| =
+e^{-h_a}$, so $h_a \ge -\log\sqrt{2D} = \frac12\log\frac1{2D}$, and
+$D \le \frac1{60}$ gives the numerical bound ($\frac12\log 30 =
+1.700598\ldots$).  $\square$
+
+**The dip/bulk/spike decomposition.**  Partition the cube by the value
+of the density:
+
+$$
+\mathcal S = \{s : X(s) \le \tfrac12\} \;\text{(dips)},\quad
+\mathcal T = \{s : \tfrac12 < X(s) \le 2\} \;\text{(bulk)},\quad
+\mathcal S' = \{s : X(s) > 2\} \;\text{(spikes)}.
+$$
+
+For dips write $\beta_s = -\log X(s) \ge \log 2$ (the *depth*; finite,
+since calibrated laws have full support), and define the **dip
+transform**
+
+$$
+\Phi(a) \;=\; \sum_{s \in \mathcal S} \beta_s\, \chi_a(s)
+\qquad (a \in \mathbb{F}_2^n),
+$$
+
+with $\Phi \equiv 0$ if $\mathcal S = \varnothing$.  For spikes write
+$\nu_s = X(s) - 1 > 1$ and $\gamma_s = \log X(s) \in (\log 2,\,
+\log N]$.  Set $k = |\mathcal S|$.
+
+> **Lemma 5.2 (bookkeeping).**  With $D \le \frac1{60}$ and
+> $\varepsilon := \sqrt{2D}$ (a scalar, not to be confused with the orientation $\epsilon$):
+>
+> (i) $\;k \le \dfrac{DN}{\psi(1/2)} < 0.108630\,N$, where
+> $\psi(\tfrac12) = \tfrac{1-\log 2}{2} = 0.153426\ldots$;
+>
+> (ii) $\;\sum_{s \in \mathcal S'} \gamma_s \le \sum_{s\in\mathcal S'}
+> \nu_s \le \tfrac{N\varepsilon}{2}$;
+>
+> (iii) $\;\dfrac1N\sum_{s \in \mathcal T} |\log X(s)| \le
+> 2\varepsilon$.
+
+*Proof.*  (i) Dips have $X \le \frac12 < 1$, and $\psi$ is decreasing
+on $[0,1]$ (Lemma 2.2), so each dip contributes $\psi(X(s)) \ge
+\psi(\frac12)$ to $ND = \sum_s \psi(X(s))$, whence $k\,\psi(\tfrac12)
+\le ND$.  Numerically $\psi(\tfrac12) = \tfrac12\log\tfrac12 -
+\tfrac12 + 1 = \tfrac{1-\log2}{2}$ and $\frac{1}{60\,\psi(1/2)} =
+0.1086297\ldots < 0.108630$.
+
+(ii) $\log(1+x) \le x$ gives $\gamma_s = \log(1+\nu_s) \le \nu_s$;
+and $\sum_{\mathcal S'} \nu_s \le \sum_s (X(s)-1)_+ =
+N\,\mathbb{E}_U(X-1)_+ = \tfrac N2 \mathbb{E}_U|X-1| \le
+\tfrac{N\varepsilon}{2}$ by Lemma 2.1 and mean matching.
+
+(iii) On $[\tfrac12, 2]$ we claim $|\log x| \le 2|x-1|$: for $x \in
+[1,2]$, $\log x \le x - 1$; for $x \in [\tfrac12, 1]$, $\log\tfrac1x
+\le \tfrac{1-x}{x} \le 2(1-x)$ since $x \ge \tfrac12$.  Hence
+$\sum_{\mathcal T}|\log X| \le 2\sum_{\mathcal T}|X-1| \le
+2N\,\mathbb{E}_U|X-1| \le 2N\varepsilon$.  $\square$
+
+> **Proposition 5.3 (spectral floor and sign readout).**  Let
+> $\varepsilon_G := \tfrac52\sqrt{2D} \le \tfrac52\sqrt{1/30} <
+> 0.45644$, and note $h_{\min} > 2\varepsilon_G$ (indeed $1.70059 >
+> 0.91288$).  Then for every $a \ne 0$:
+>
+> (i) $\;\Big|\widehat{\log X}(a) + \dfrac{\Phi(a)}{N}\Big| \le
+> \varepsilon_G$;
+>
+> (ii) $\;|\Phi(a)| \;\ge\; N\,(h_{\min} - \varepsilon_G) \;>\;
+> 1.24416\,N$;
+>
+> (iii) $\;\epsilon_a = -\operatorname{sgn} \Phi(a)$.
+
+*Proof.*  (i) Split $\widehat{\log X}(a) = \frac1N\sum_s \log X(s)\,
+\chi_a(s)$ over the three classes.  The dip part is exactly
+$-\Phi(a)/N$.  The spike part is at most $\frac1N\sum_{\mathcal S'}
+\gamma_s \le \frac\varepsilon2$ in absolute value by Lemma 5.2(ii),
+and the bulk part is at most $\frac1N\sum_{\mathcal T}|\log X| \le
+2\varepsilon$ by Lemma 5.2(iii).  Total error: $\frac52\varepsilon =
+\varepsilon_G$.
+
+(ii) By calibration $|\widehat{\log X}(a)| = h_a \ge h_{\min}$, so by
+(i), $|\Phi(a)|/N \ge h_a - \varepsilon_G \ge h_{\min} - \varepsilon_G$.
+Numerically $h_{\min} - \varepsilon_G > 1.70059 - 0.45644 = 1.24415$;
+in fact evaluating both bounds at their common worst case $D =
+\tfrac1{60}$ gives $h' := \tfrac12\log30 - \tfrac52\sqrt{1/30} =
+1.244163\ldots > 1.24416$.  (Both $\tfrac12\log\tfrac1{2D}$ decreasing
+and $\tfrac52\sqrt{2D}$ increasing in $D$ make $D = \tfrac1{60}$ the
+simultaneous worst case.)
+
+(iii) By (ii), $|\Phi(a)|/N \ge h_{\min} - \varepsilon_G >
+\varepsilon_G$, so in (i) the term $-\Phi(a)/N$ strictly dominates the
+error: $\widehat{\log X}(a)$ and $-\Phi(a)$ have the same (nonzero)
+sign.  Since $\widehat{\log X}(a) = \epsilon_a h_a$ with $h_a > 0$,
+$\epsilon_a = \operatorname{sgn}\widehat{\log X}(a) =
+-\operatorname{sgn} \Phi(a)$.  $\square$
+
+Proposition 5.3(iii) is the pivot of the whole proof: *at low entropy,
+the orientation is read off the deeply suppressed points.*  Note also
+that (ii) with $\Phi \equiv 0$ is impossible, so $\mathcal S \ne
+\varnothing$ automatically.
+
+> **Proposition 5.4 (dominance criterion).**  Suppose some dip
+> $s_1 \in \mathcal S$ dominates the total depth:
+> $\beta_{s_1} \ge \sum_{s \in \mathcal S \setminus \{s_1\}} \beta_s$.
+> Then $\epsilon$ is the delta orientation at $s_1$.
+
+*Proof.*  Write $\Phi(a) = \beta_{s_1}\chi_a(s_1) + R(a)$ with $|R(a)|
+\le \sum_{s \ne s_1}\beta_s \le \beta_{s_1}$.  Then $\chi_a(s_1) \Phi(a)
+= \beta_{s_1} + \chi_a(s_1)R(a) \ge 0$ for every $a$, and equality
+would force $\Phi(a) = 0$, which Proposition 5.3(ii) excludes.  Hence
+$\operatorname{sgn}\Phi(a) = \chi_a(s_1)$ for every $a \ne 0$, and
+Proposition 5.3(iii) gives $\epsilon_a = -\chi_a(s_1)$: the delta
+orientation at $s_1$.  $\square$
+
+## 6. The deep-dip trichotomy
+
+> **Theorem 6.1 (deep-dip trichotomy).**  Let $\epsilon$ be an
+> orientation that is **not** a delta orientation, and suppose its
+> calibrated law has $D \le \frac1{60}$.  Then at least three points
+> of the cube satisfy $X(s) \le e^{-5}$, and consequently
+> $$
+> N \cdot D \;\ge\; 3\,\psi(e^{-5}) \;=\; 3\,(1 - 6e^{-5})
+> \;>\; 2.878716 .
+> $$
+
+*Proof.*  Call a dip **deep** if $\beta_s \ge 5$ (i.e. $X(s) \le
+e^{-5}$) and **shallow** otherwise, and let $m$ be the number of deep
+dips.  By Lemma 5.2(i) the shallow total depth obeys
+$$
+\Sigma_{\mathrm{sh}} \;:=\; \sum_{\text{shallow } s} \beta_s
+\;<\; 5k \;\le\; \frac{5N}{60\,\psi(1/2)} \;<\; 0.543149\,N .
+$$
+Recall $h' > 1.244163$ from Proposition 5.3(ii).  We rule out $m \le
+2$.
+
+**Case $m = 0$.**  Every dip is shallow, so for any $a \ne 0$ (such
+masks exist as $N \ge 4$),
+$$
+|\Phi(a)| \;\le\; \sum_{s \in \mathcal S}\beta_s \;=\;
+\Sigma_{\mathrm{sh}} \;<\; 0.543149\,N \;<\; 1.24416\,N \;\le\;
+|\Phi(a)|,
+$$
+a contradiction.  (This subsumes $k = 0$, where $\Phi \equiv 0$.)
+
+**Case $m = 1$**, deep dip $s_1$.  For any $a \ne 0$, $|\Phi(a)| \le
+\beta_{s_1} + \Sigma_{\mathrm{sh}}$, so Proposition 5.3(ii) forces
+$$
+\beta_{s_1} \;\ge\; N h' - \Sigma_{\mathrm{sh}}
+\;>\; (1.244163 - 0.543149)\,N \;=\; 0.701014\,N
+\;>\; 0.543149\,N \;>\; \Sigma_{\mathrm{sh}}
+\;=\; \sum_{s \ne s_1}\beta_s ,
+$$
+so $s_1$ dominates and Proposition 5.4 says $\epsilon$ is a delta
+orientation — contradiction.
+
+**Case $m = 2$**, deep dips $s_1, s_2$ with (without loss of
+generality) $\beta_{s_1} \ge
+\beta_{s_2}$.  Since $t := s_1 + s_2 \ne 0$, the set $\{a :
+\chi_a(t) = -1\}$ has exactly $N/2$ elements and does not contain
+$a = 0$; pick such an $a$.  For it, $\chi_a(s_2) = -\chi_a(s_1)$, so
+$$
+|\Phi(a)| \;\le\; |\beta_{s_1} - \beta_{s_2}| + \Sigma_{\mathrm{sh}},
+\qquad\text{whence}\qquad
+\beta_{s_1} - \beta_{s_2} \;\ge\; Nh' - \Sigma_{\mathrm{sh}} \;>\;
+0.701014\,N .
+$$
+Then
+$$
+\beta_{s_1} - \Big(\beta_{s_2} + \Sigma_{\mathrm{sh}}\Big)
+\;>\; 0.701014\,N - 0.543149\,N \;=\; 0.157865\,N \;>\; 0,
+$$
+so again $s_1$ dominates the total depth and Proposition 5.4 gives a
+contradiction.
+
+**Conclusion.**  $m \ge 3$.  Deep dips have $X(s) \le e^{-5} < 1$ and
+$\psi$ is decreasing on $[0,1]$, so each contributes $\psi(X(s)) \ge
+\psi(e^{-5}) = e^{-5}(-5) - e^{-5} + 1 = 1 - 6e^{-5}$ to $ND =
+\sum_s\psi(X(s))$ (Lemma 2.2), and all terms are nonnegative.  Hence
+$ND \ge 3(1 - 6e^{-5}) = 2.8787169\ldots > 2.878716$.  $\square$
+
+## 7. Proof of the main theorem for $n \ge 6$
+
+> **Theorem 7.1.**  Let $n \ge 6$ and let $\epsilon$ be any
+> orientation that is not a delta orientation.  Then
+> $\widehat m(\epsilon) > D_\delta$.
+
+*Proof.*  Write $D = \widehat m(\epsilon)$ and split into two cases.
+
+**Case $D > \frac1{60}$.**  Since $n \ge 6$, $N - 1 \ge 63$, so Lemma
+4.2 gives
+$$
+D_\delta \;<\; \frac1{N-1} \;\le\; \frac1{63} \;<\; \frac1{60}
+\;<\; D .
+$$
+
+**Case $D \le \frac1{60}$.**  Theorem 6.1 applies and gives $D \ge
+2.878716/N$.  Since $2.878716\,(N-1) > N$ for every $N \ge 2$
+(equivalently $N > \tfrac{2.878716}{1.878716} = 1.532\ldots$),
+$$
+D \;\ge\; \frac{2.878716}{N} \;>\; \frac{1}{N-1} \;>\; D_\delta .
+$$
+(For $n = 6, 7$ this case is in fact vacuous — the conclusion of
+Theorem 6.1 contradicts $D \le \frac1{60}$ when $N < 60 \cdot
+2.878716$ — which is a legitimate outcome of the case split: those
+$n$ are carried entirely by the first case.)
+
+Both cases give strict inequality.  $\square$
+
+*Proof of Theorem 1.2 and Corollary 1.3.*  For $n \ge 6$: Theorem 7.1
+gives strict inequality for every non-delta orientation, and all $N$
+delta orientations share the value $D_\delta$ by Lemma 3.2; the
+equality set is therefore exactly the delta family, and the
+quantitative floor of Corollary 1.3 is the case split just proved
+($D > \frac1{60}$ gives $ND > N/60$; otherwise $ND \ge 2.878716$),
+together with $N D_\delta < N/(N-1) \le 64/63$ from Lemma 4.2.  For
+$2 \le n \le 5$ the statement is Theorem 8.3 below (certified
+computation).  $\square$
+
+## 8. The certified computation for $2 \le n \le 5$
+
+This section proves the main theorem in the range the analytic
+argument does not reach.  The computation is organized so that every
+reported number carries an a posteriori error certificate resting on
+the two lemmas below; the code and canonical outputs ship with this
+repository (Section 10), and the trust base is stated in full in
+Section 8.5.
+
+### 8.1 Certification lemmas
+
+The solver minimizes the strictly convex $G_\epsilon$ of Theorem 3.1
+by damped Newton iteration.  Certification does not trust the
+iteration: it evaluates, at the numeric output $\tilde\ell$, the
+gradient residual and a curvature floor, and converts them into a
+rigorous error radius.
+
+> **Lemma 8.1 (a posteriori radius).**  Fix an orientation $\epsilon$
+> and any $\tilde\ell \in \mathbb{R}^{N-1}$.  Let $\rho =
+> \Vert\nabla G_\epsilon(\tilde\ell)\Vert_2$ and $\lambda = \min_a
+> e^{-\epsilon_a\tilde\ell_a}$.  If $r_0 := 2e\rho/\lambda \le 1$,
+> then the true minimizer satisfies
+> $\Vert\ell^\ast - \tilde\ell\Vert_2 \le r_0$.
+
+*Proof.*  If $\rho = 0$ then $\tilde\ell = \ell^\ast$ by strict
+convexity.  Otherwise, suppose $T := \Vert\ell^\ast -
+\tilde\ell\Vert_2 > r_0$ and let $v = (\ell^\ast -
+\tilde\ell)/T$.  The function $g(t) = \langle \nabla
+G_\epsilon(\tilde\ell + tv),\, v\rangle$ is nondecreasing (convexity)
+with $g(T) = 0$ and $g(0) \ge -\rho$ (Cauchy–Schwarz).  On the segment
+$t \in [0, r_0]$, each coordinate moves by at most $|t v_a| \le t \le
+1$, so the barrier part of the Hessian obeys
+$e^{-\epsilon_a(\tilde\ell_a + t v_a)} \ge \lambda e^{-1}$, and
+$\nabla^2 G_\epsilon \succeq \operatorname{diag}(e^{-\epsilon_a
+\ell_a}) \succeq \lambda e^{-1} I$ there (the covariance part is
+positive semidefinite).  Hence
+$$
+g(r_0) \;\ge\; g(0) + r_0\,\lambda e^{-1}
+\;\ge\; -\rho + \frac{2e\rho}{\lambda}\cdot\frac{\lambda}{e}
+\;=\; \rho \;>\; 0 ,
+$$
+contradicting $g$ nondecreasing with $g(T) = 0$ at $T > r_0$.
+$\square$
+
+> **Lemma 8.2 (entropy transfer).**  Let $\mathcal D(\ell) :=
+> D(P_\ell \Vert U) = \langle \ell, x(\ell)\rangle - F(\ell)$.  Then
+> $\nabla\mathcal D(\ell) = \nabla^2 F(\ell)\,\ell$ and
+> $\Vert\nabla^2 F(\ell)\Vert_{\mathrm{op}} \le N - 1$; consequently,
+> in the setting of Lemma 8.1,
+> $$
+> \big|\mathcal D(\ell^\ast) - \mathcal D(\tilde\ell)\big|
+> \;\le\; (N-1)\,\big(\Vert\tilde\ell\Vert_2 + r_0\big)\, r_0 .
+> $$
+
+*Proof.*  $\log X_\ell = \sum_a \ell_a\chi_a - F(\ell)$, so
+$\mathcal D(\ell) = \mathbb{E}_{P_\ell}[\log X_\ell] = \langle\ell,
+x(\ell)\rangle - F(\ell)$ and
+$\nabla \mathcal D = x + \nabla^2 F\,\ell - x = \nabla^2 F\,\ell$.
+The Hessian $\nabla^2 F = \operatorname{Cov}_{P_\ell}(\chi) \preceq
+\mathbb{E}_{P_\ell}[\chi\chi^{\mathsf T}]$ in the positive
+semidefinite order (subtracting the rank-one $xx^{\mathsf T}$), and a
+positive semidefinite matrix has operator norm at most its trace:
+$\operatorname{tr}\,\mathbb{E}[\chi\chi^{\mathsf T}] =
+\sum_{a\ne0}\mathbb{E}[\chi_a^2] = N-1$.  The transfer bound is the
+mean value inequality along the segment, whose points have norm at
+most $\Vert\tilde\ell\Vert_2 + r_0$.  $\square$
+
+**Delta reference values.**  $u_\star$ is bracketed by
+sign-of-$p$ bisection (Proposition 4.1: $p$ strictly increasing,
+$p(0) < 0 < p(\tfrac1{N-1})$) to width $2^{-300}$ at 60 significant
+digits, and $D_\delta = \frac1N[A\log A + (N-1)B\log B]$ is evaluated
+at both bracket ends.  On the bracket, $D_\delta(u)$ is strictly
+increasing, $\frac{d}{du}D_\delta(u) = \frac{N-1}{N}\log\frac{B}{A} > 0$ — so the two endpoint evaluations enclose the true value up to
+the arithmetic error of the evaluations themselves.
+
+### 8.2 Exhaustive certification for $n = 2, 3, 4$
+
+For each of the $2^{N-1}$ orientations ($8$, $128$, $32768$): solve by
+damped Newton in double precision; re-evaluate $\rho$, $\lambda$, and
+$\mathcal D(\tilde\ell)$ at the exact binary-rational point
+$\tilde\ell$ in 30-significant-digit arithmetic; apply Lemmas 8.1 and
+8.2; and compare the certified enclosure of $\mathcal D(\ell^\ast)$
+against the certified delta enclosure.  Outcomes (canonical outputs in
+`receipts/`):
+
+| $n$ | orientations | failures | worst certified non-delta margin | max $r_0$ | max entropy error |
+|---|---|---|---|---|---|
+| 2 | 8 | 0 | 0.193236 | $5.8\times10^{-14}$ | $3.4\times10^{-13}$ |
+| 3 | 128 | 0 | 0.462239 | $2.8\times10^{-14}$ | $5.5\times10^{-13}$ |
+| 4 | 32768 | 0 | 0.263509 | $2.3\times10^{-11}$ | $1.7\times10^{-9}$ |
+
+Each margin is (certified lower bound on the non-delta value) minus
+(certified upper bound on $D_\delta$); every delta orientation's
+enclosure matched the closed-form reference.  The certified errors are
+8–12 orders of magnitude below the margins.
+
+### 8.3 Orbit reduction and certification for $n = 5$
+
+At $n = 5$ there are $2^{31}$ orientations; exhaustive certification
+is avoided using the symmetry group $\Gamma_5 = \langle\text{
+translations}, GL(5,2)\rangle$, under which $\widehat m$ is invariant
+(Lemmas 3.2 and 3.3) and the delta family forms one orbit.
+
+*Generators.*  Translations by the $n$ basis vectors realize all
+translations.  For $GL(5,2)$ we use the coordinate cycle, the
+transposition of the first two coordinates, and the transvection
+$e_2 \mapsto e_1 + e_2$: transpositions plus the cycle generate all
+coordinate permutations, and conjugating the transvection by
+permutations yields every elementary transvection $e_j \mapsto e_i +
+e_j$; elementary transvections generate $GL(n,2)$ (row reduction over
+$\mathbb{F}_2$).
+
+*Enumeration.*  A breadth-first search over the full state space
+$\{\pm1\}^{31}$ (bitmask representation, $2^{31}$ states, a visited
+bitmap) partitions it into orbits of the generated group.  The
+partition is complete *by construction*; as a certificate, the orbit
+sizes are summed and checked to equal $2^{31}$ exactly.  Result:
+**176 orbits**.  Two independent cross-checks: (i) at $n = 2, 3, 4$
+the same BFS code yields $2$, $4$, $14$ orbits, matching the exhaustive
+enumerations of Section 8.2; (ii) an independent
+Burnside-lemma computation (receipt `w5`): for each $M \in GL(n,2)$ the
+elements $(t, M)$ of $\Gamma_n$ jointly fix $2^{c(M) + n - r(M)}$
+orientations, where $c(M)$ is the number of cycles of $a \mapsto
+M^{\mathsf T}a$ on nonzero masks and $r(M)$ the $\mathbb{F}_2$-rank of
+the cycle-XOR values (a $\sigma$ fixed by $(t,M)$ needs $\chi_{X_j}(t)
+= 1$ for each cycle-XOR $X_j$, leaving $2^{c(M)}$ free signs); averaging
+over all $9{,}999{,}360$ elements of $GL(5,2)$ gives exactly $176$, with
+the divisibility check exact, and the same program reproduces $2, 4, 14$
+at $n = 2, 3, 4$.  (Even if the generators had generated a proper subgroup, the
+enumeration would only *refine* the true orbit partition and the
+certification below would remain valid — the Burnside match shows it
+is in fact the full partition.)
+
+*Certification.*  Each of the 176 representatives is solved with a
+double-precision warm start plus Newton refinement at 40 significant
+digits, then certified via Lemmas 8.1–8.2.  Outcomes: zero failures;
+the delta orbit (size 32) is uniquely minimal with
+$$
+D_\delta(n{=}5) = 0.0317486983145803\ldots,
+$$
+matching the closed-form reference; the worst certified non-delta
+margin is $0.138872$ (attained by the orbit of size 4960 described in
+Section 9), with certified entropy errors below $10^{-32}$ on every orbit (the
+receipt prints the global maximum; the five tabulated orbits sit below
+$10^{-33}$).  The five
+lowest orbit values:
+
+| orbit representative | orbit size | certified $\widehat m$ |
+|---|---|---|
+| delta orbit | 32 | 0.031748698 |
+| three-dip family (Section 9) | 4960 | 0.170621384 |
+| — | 27776 | 0.234706844 |
+| $j{=}3$ family (Section 9) | 34720 | 0.243617531 |
+| — | 317440 | 0.405832442 |
+
+> **Theorem 8.3.**  For $2 \le n \le 5$, every non-delta orientation
+> satisfies $\widehat m(\epsilon) > D_\delta$, with certified margin
+> at least $0.138$; the equality set of Theorem 1.2 is exactly the
+> delta family.  *(Computer-assisted; trust base in Section 8.5.)*
+
+### 8.4 Independent replication
+
+During development, all computations were additionally replicated on
+independently written code paths (separate solver implementations,
+including a log-domain variant): the $n = 4$ exhaustive scan reproduced
+every value; the 176 orbit representatives reproduced to $\le
+4\times10^{-10}$; and an adversarial search campaign (about
+$5.5\times10^4$ solves at $4 \le n \le 13$, including designed attacks
+on the trichotomy of Theorem 6.1) found no violation of any inequality
+asserted in this paper — in particular, no calibrated non-delta law
+with fewer than three deep dips was found at any entropy level.  These
+replications are *not* shipped with this repository and none of the
+certificates above rely on them; the shipped, rerunnable evidence is
+receipts `w1`–`w5`.
+
+### 8.5 Trust base
+
+The $n \le 5$ leg of Theorem 1.2 is computer-assisted in the following
+precise sense.  Arithmetic is faithful round-to-nearest
+multiple-precision floating point (mpmath [5], 30–60 significant
+digits), not directed-rounding interval arithmetic; the certified
+margins ($\ge 0.138$) exceed the certified error bounds
+($\le 1.7\times10^{-9}$) by 8 orders of magnitude and the residual
+arithmetic uncertainty of the evaluations themselves by far more, and
+all values were independently replicated (Section 8.4), but a fully
+formal verification would substitute outward-rounded interval
+arithmetic throughout — a mechanical upgrade that we have not
+performed.  The two C programs (`w2`, `w5`) use exact 64-bit
+integer arithmetic only — no floating point — so they require no
+rounding analysis; they compile with any C99 compiler (`cc -O2`; the
+canonical outputs were produced with Apple clang).  The remaining
+trust items are: correctness of Lemmas
+8.1–8.2 (proved above), completeness of the orbit partition (checksum
+plus the independent Burnside count of receipt `w5`), and the invariance lemmas 3.2–3.3
+(proved above).  The analytic part of the paper ($n \ge 6$) uses no
+computation.
+
+## 9. Sharpness: the three-dip family and the runner-up constant
+
+The proof of Theorem 6.1 shows any cheap non-delta orientation must
+extinguish at least three points.  There is a canonical family that
+extinguishes *exactly* three, and it appears to be the true runner-up.
+Fix two distinct nonzero masks $t_1, t_2$ (say the first two
+coordinate masks) and define
+$$
+\epsilon_a = \begin{cases}
++1, & \chi_a(t_1) = \chi_a(t_2) = -1
+\text{ (both defining bits of } a \text{ set)},\\
+-1, & \text{otherwise.}
+\end{cases}
+$$
+Equivalently: start from the delta at $0$ and flip the signs on the
+quarter of the masks containing both distinguished bits.  Its
+calibrated law (computed by the certified solver; this is the
+size-4960 orbit of Section 8.3 at $n=5$, and the runner-up in the
+exhaustive scans at $n = 3, 4$) extinguishes the three points $\{0,
+e_1, e_2\}$ of the affine plane $\{0, e_1, e_2, e_1{+}e_2\}$, boosts
+the fourth plane point to $X \to 4$, and is asymptotically uniform
+elsewhere.  Its entropy gap satisfies, numerically,
+
+| $n$ | 3 | 4 | 5 | 6 | 7 | 8 |
+|---|---|---|---|---|---|---|
+| $N \cdot \widehat m$ | 4.7662 | 5.2488 | 5.4599 | 5.5233 | 5.5397 | 5.5438 |
+
+converging to $4\log4 = 5.545177\ldots$, which is exactly
+$3\,\psi(0) + \psi(4)$ — three extinguished points at limit cost $1$
+each, plus one point at density $4$ (the value forced by conservation
+of mass within the plane).  The $n \le 5$ entries are certified
+(Sections 8.2–8.3); the trend in $n$ is monotone increasing.  The
+generalization that flips signs on the masks containing $j$ fixed bits
+extinguishes $2^{j-1}+1$ points and satisfies $N\widehat m \to
+2^j\log\frac{2^j}{2^{j-1}-1}$ numerically ($7.84663\ldots$ at $j=3$),
+increasing in $j$.  (The case $j = 1$ is not degenerate but exact:
+flipping the masks that contain one fixed bit turns the delta at $0$
+into the delta at $e_1$, whose constant is $N D_\delta \to 1$; the
+displayed formulas apply for $j \ge 2$.)
+
+> **Conjecture 9.1 (sharp runner-up).**  $\displaystyle
+> \liminf_{n\to\infty}\ \min_{\epsilon \text{ non-delta}}\
+> N\cdot\widehat m(\epsilon) \;=\; 4\log 4 ,$ attained along the
+> three-dip family.
+
+The gap between the proved floor $2.878716$ (Theorem 6.1) and the
+conjectured $5.545$ is the price of the trichotomy's generosity to
+shallow dips; closing it would require classifying the limit
+configurations of calibrated laws at entropy scale $1/N$, which we
+leave open.  We note that Theorem 1.2 itself needed only the floor to
+beat $N D_\delta < 64/63$ — the margin is $2.8\times$, which is why
+the theorem closes while the sharp constant remains open.
+
+## 10. Code and reproducibility
+
+All code is in `code/` and all canonical outputs in `receipts/` of
+this repository.
+
+- `w1_cert_small_n.py` — exhaustive certified verification for $n =
+  2, 3, 4$ (Section 8.2): double-precision damped Newton on
+  $G_\epsilon$, 30-digit re-evaluation at the exact output point,
+  Lemmas 8.1–8.2, delta bracketing at 60 digits.  Receipt:
+  `w1_cert_small_n.out` ($n=4$ takes roughly an hour on a laptop).
+- `w2_orbit_bfs.c` — the $\Gamma_n$-orbit enumeration by BFS with
+  completeness checksum (Section 8.3), for $n \le 5$; prints the
+  summary line (orbit count and checksum) to stdout and writes one
+  line per orbit (minimal representative, size) to `orbits_n<n>.txt`.
+  Receipts: `w2_orbit_bfs.out` (the four summary lines, counts
+  $2/4/14/176$) and `w2_orbits_n5.txt` (the 176-line orbit list).
+- `w3_cert_n5.py` — certified solves of the 176 representatives
+  (Section 8.3), 40-digit refinement plus certificates; reads the
+  orbit list from `receipts/` by a script-relative path (runs from any
+  working directory) and writes a per-orbit array to `/tmp`.  Receipt:
+  `w3_cert_n5.out`.
+- `w5_burnside.c` — the independent Burnside-lemma orbit count of
+  Section 8.3 (all invertible matrices enumerated; exact divisibility
+  checked).  Receipt: `w5_burnside.out`.
+- `w4_family_receipt.py` — the three-dip and $j{=}3$ families at $n =
+  9, 10, 11$: verifies in log-domain every inequality of Sections 5–6
+  on genuinely low-entropy laws (parameter floor, spectral floor, sign
+  readout, deep-dip count, the trichotomy conclusion), and prints the
+  Section 9 table.  Receipt: `w4_family_receipt.out`.  *Numerical
+  note:* depths reach $\beta \sim N\log(N/4)$, far below double
+  precision underflow ($X \sim e^{-5700}$ at $n=10$); all
+  depth-dependent quantities must be computed in log-domain, i.e.
+  $\log X = \log N + \text{field} - \operatorname{logsumexp}$, never
+  by exponentiating.
+
+## Declarations
+
+No funding was received for this work.  The author has no competing
+interests.  All code and canonical outputs needed to verify the
+computer-assisted claims ship with this paper (Section 10).
+
+## References
+
+[1] T. M. Cover and J. A. Thomas, *Elements of Information Theory*,
+2nd ed., Wiley, 2006.  (Pinsker's inequality: Lemma 11.6.1.)
+
+[2] R. O'Donnell, *Analysis of Boolean Functions*, Cambridge
+University Press, 2014.
+
+[3] T. Erdélyi, Recent progress in the study of polynomials with
+constrained coefficients, in *Trigonometric Sums and Their
+Applications*, Springer, 2020, pp. 29–69.
+
+[4] M. J. Wainwright and M. I. Jordan, Graphical models, exponential
+families, and variational inference, *Foundations and Trends in
+Machine Learning* 1 (2008), 1–305.
+
+[5] F. Johansson et al., *mpmath: a Python library for
+arbitrary-precision floating-point arithmetic*, version 1.3.0 (2023),
+https://mpmath.org/.
+
+[6] M. Mézard and A. Montanari, *Information, Physics, and
+Computation*, Oxford University Press, 2009.

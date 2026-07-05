@@ -1,0 +1,13 @@
+n=2: CERTIFIED. orientations=8, failures=0
+  D_delta in [0.2666533651797380983953865, 0.2666533651797380983953865]
+  worst certified non-delta margin = 0.193236130319688 (idx 4)
+  max Kantorovich radius r0 = 5.778e-14, max |D|-error = 3.345e-13
+n=3: CERTIFIED. orientations=128, failures=0
+  D_delta in [0.1335309820724719738497872, 0.1335309820724719738497872]
+  worst certified non-delta margin = 0.462239456384591 (idx 114)
+  max Kantorovich radius r0 = 2.718e-14, max |D|-error = 5.457e-13
+n=4: CERTIFIED. orientations=32768, failures=0
+  D_delta in [0.06453852113757117122300464, 0.06453852113757117122300464]
+  worst certified non-delta margin = 0.263509278574703 (idx 2655)
+  max Kantorovich radius r0 = 2.269e-11, max |D|-error = 1.626e-9
+ALL CERTIFIED
